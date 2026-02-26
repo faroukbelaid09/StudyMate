@@ -1,0 +1,6 @@
+@StudyMate.API_HostAddress = http://localhost:5110
+
+GET {{StudyMate.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
