@@ -4,7 +4,7 @@ using System.Security.Claims;
 using StudyMate.API.Data;
 using StudyMate.API.DTOs.Lectures;
 using StudyMate.API.Models;
-
+using Microsoft.EntityFrameworkCore;
 namespace StudyMate.API.Controllers;
 
 [ApiController]
@@ -68,5 +68,25 @@ public class LecturesController : ControllerBase
         await _db.SaveChangesAsync();
 
         return Ok("Lecture uploaded.");
+    }
+
+
+    [HttpGet("mine")]
+    public async Task<ActionResult<List<LectureResponse>>> GetMine()
+    {
+        var userId =
+            int.Parse(User.FindFirstValue("uid")!);
+
+        var lectures = await _db.Lectures
+            .Where(l => l.UserId == userId)
+            .OrderByDescending(l => l.UploadedAt)
+            .Select(l => new LectureResponse(
+                l.Id,
+                l.Title,
+                l.UploadedAt
+            ))
+            .ToListAsync();
+
+        return Ok(lectures);
     }
 }
