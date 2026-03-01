@@ -5,6 +5,7 @@ using StudyMate.API.Data;
 using StudyMate.API.DTOs.Lectures;
 using StudyMate.API.Models;
 using Microsoft.EntityFrameworkCore;
+using StudyMate.API.Interfaces;
 namespace StudyMate.API.Controllers;
 
 [ApiController]
@@ -13,10 +14,14 @@ namespace StudyMate.API.Controllers;
 public class LecturesController : ControllerBase
 {
     private readonly AppDbContext _db;
+    private readonly ILectureService _lectureService;
 
-    public LecturesController(AppDbContext db)
+    public LecturesController(
+        AppDbContext db,
+        ILectureService lectureService)
     {
         _db = db;
+        _lectureService = lectureService;
     }
 
     [HttpPost("upload")]
@@ -88,5 +93,29 @@ public class LecturesController : ControllerBase
             .ToListAsync();
 
         return Ok(lectures);
+    }
+
+
+    [HttpGet("{id}/download")]
+    public async Task<IActionResult> Download(int id)
+    {
+        var userId =
+            int.Parse(User.FindFirstValue("uid")!);
+
+        try
+        {
+            var (lecture, filePath) =
+                await _lectureService
+                    .GetLectureForDownloadAsync(id, userId);
+
+            return PhysicalFile(
+                filePath,
+                "application/pdf",
+                $"{lecture.Title}.pdf");
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 }
