@@ -8,4 +8,6 @@ public interface ILectureService
         GetLectureForDownloadAsync(int lectureId, int userId);
 
     Task UploadLectureAsync(int userId, string title, IFormFile file);
+
+    Task DeleteLectureAsync(int lectureId, int userId);
 }

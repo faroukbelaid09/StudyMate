@@ -82,4 +82,38 @@ public class LectureService : ILectureService
 
         return (lecture, filePath);
     }
+
+    public async Task DeleteLectureAsync(int lectureId, int userId)
+    {
+        var lecture = await _db.Lectures
+            .FirstOrDefaultAsync(l =>
+                l.Id == lectureId &&
+                l.UserId == userId);
+
+        if (lecture is null)
+            throw new Exception("Lecture not found.");
+
+        ////////////////////////////////////////////////
+        // Delete file from disk
+        ////////////////////////////////////////////////
+
+        var uploadsFolder =
+            Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "uploads");
+
+        var filePath =
+            Path.Combine(uploadsFolder, lecture.FilePath);
+
+        if (File.Exists(filePath))
+            File.Delete(filePath);
+
+        ////////////////////////////////////////////////
+        // Remove from database
+        ////////////////////////////////////////////////
+
+        _db.Lectures.Remove(lecture);
+
+        await _db.SaveChangesAsync();
+    }
 }

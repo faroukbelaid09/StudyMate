@@ -89,4 +89,22 @@ public class LecturesController : ControllerBase
             return NotFound(ex.Message);
         }
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var userId =
+            int.Parse(User.FindFirstValue("uid")!);
+
+        try
+        {
+            await _lectureService.DeleteLectureAsync(id, userId);
+
+            return Ok("Lecture deleted.");
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
 }
