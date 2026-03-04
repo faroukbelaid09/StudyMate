@@ -107,4 +107,29 @@ public class LecturesController : ControllerBase
             return NotFound(ex.Message);
         }
     }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<LectureResponse>> GetLecture(int id)
+    {
+        var userId =
+            int.Parse(User.FindFirstValue("uid")!);
+
+        try
+        {
+            var lecture =
+                await _lectureService.GetLectureAsync(id, userId);
+
+            var response = new LectureResponse(
+                lecture.Id,
+                lecture.Title,
+                lecture.UploadedAt
+            );
+
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
+    }
 }
