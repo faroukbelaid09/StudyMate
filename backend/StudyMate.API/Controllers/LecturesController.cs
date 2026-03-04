@@ -31,48 +31,19 @@ public class LecturesController : ControllerBase
         var userId =
             int.Parse(User.FindFirstValue("uid")!);
 
-        if (req.File.Length == 0)
-            return BadRequest("Empty file.");
-
-        //////////////////////////////////////////////////
-        // Save File
-        //////////////////////////////////////////////////
-
-        var uploadsFolder =
-            Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "uploads");
-
-        Directory.CreateDirectory(uploadsFolder);
-
-        var fileName =
-            $"{Guid.NewGuid()}.pdf";
-
-        var filePath =
-            Path.Combine(uploadsFolder, fileName);
-
-        using var stream =
-            System.IO.File.Create(filePath);
-
-        await req.File.CopyToAsync(stream);
-
-        //////////////////////////////////////////////////
-        // Save Database
-        //////////////////////////////////////////////////
-
-        var lecture = new Lecture
+        try
         {
-            UserId = userId,
-            Title = req.Title,
-            FilePath = fileName,
-            UploadedAt = DateTime.UtcNow
-        };
+            await _lectureService.UploadLectureAsync(
+                userId,
+                req.Title,
+                req.File);
 
-        _db.Lectures.Add(lecture);
-
-        await _db.SaveChangesAsync();
-
-        return Ok("Lecture uploaded.");
+            return Ok("Lecture uploaded.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
 

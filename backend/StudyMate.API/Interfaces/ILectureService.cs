@@ -6,4 +6,6 @@ public interface ILectureService
 {
     Task<(Lecture lecture, string filePath)>
         GetLectureForDownloadAsync(int lectureId, int userId);
+
+    Task UploadLectureAsync(int userId, string title, IFormFile file);
 }
