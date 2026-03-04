@@ -52,7 +52,8 @@ public class LectureService : ILectureService
             UserId = userId,
             Title = title,
             FilePath = fileName,
-            UploadedAt = DateTime.UtcNow
+            UploadedAt = DateTime.UtcNow,
+            Status = LectureStatus.Uploaded
         };
 
         _db.Lectures.Add(lecture);
@@ -182,6 +183,8 @@ public class LectureService : ILectureService
         //////////////////////////////////////////////////
 
         lecture.ExtractedText = extractedText;
+
+        lecture.Status = LectureStatus.TextExtracted;
 
         await _db.SaveChangesAsync();
     }

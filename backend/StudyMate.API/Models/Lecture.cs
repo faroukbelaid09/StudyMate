@@ -13,4 +13,6 @@ public class Lecture
     public DateTime UploadedAt { get; set; }
 
     public string? ExtractedText { get; set; }
+
+    public LectureStatus Status { get; set; } = LectureStatus.Uploaded;
 }
