@@ -2,6 +2,8 @@
 using StudyMate.API.Data;
 using StudyMate.API.Interfaces;
 using StudyMate.API.Models;
+using UglyToad.PdfPig;
+using System.Text;
 
 namespace StudyMate.API.Services;
 
@@ -129,6 +131,58 @@ public class LectureService : ILectureService
 
         return lecture;
     }
-    
 
+    public async Task ExtractTextAsync(int lectureId, int userId)
+    {
+        //////////////////////////////////////////////////
+        // Find lecture
+        //////////////////////////////////////////////////
+
+        var lecture = await _db.Lectures
+            .FirstOrDefaultAsync(l =>
+                l.Id == lectureId &&
+                l.UserId == userId);
+
+        if (lecture is null)
+            throw new Exception("Lecture not found.");
+
+        //////////////////////////////////////////////////
+        // Build file path
+        //////////////////////////////////////////////////
+
+        var uploadsFolder =
+            Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "uploads");
+
+        var filePath =
+            Path.Combine(uploadsFolder, lecture.FilePath);
+
+        if (!File.Exists(filePath))
+            throw new Exception("PDF file not found.");
+
+        //////////////////////////////////////////////////
+        // Extract PDF text
+        //////////////////////////////////////////////////
+
+        var textBuilder = new StringBuilder();
+
+        using (var document = PdfDocument.Open(filePath))
+        {
+            foreach (var page in document.GetPages())
+            {
+                textBuilder.AppendLine(page.Text);
+            }
+        }
+
+        var extractedText = textBuilder.ToString();
+
+        //////////////////////////////////////////////////
+        // Save extracted text
+        //////////////////////////////////////////////////
+
+        lecture.ExtractedText = extractedText;
+
+        await _db.SaveChangesAsync();
+    }
 }

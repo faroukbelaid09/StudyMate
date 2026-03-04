@@ -46,7 +46,6 @@ public class LecturesController : ControllerBase
         }
     }
 
-
     [HttpGet("mine")]
     public async Task<ActionResult<List<LectureResponse>>> GetMine()
     {
@@ -65,7 +64,6 @@ public class LecturesController : ControllerBase
 
         return Ok(lectures);
     }
-
 
     [HttpGet("{id}/download")]
     public async Task<IActionResult> Download(int id)
@@ -130,6 +128,24 @@ public class LecturesController : ControllerBase
         catch (Exception ex)
         {
             return NotFound(ex.Message);
+        }
+    }
+
+    [HttpPost("{id}/extract-text")]
+    public async Task<IActionResult> ExtractText(int id)
+    {
+        var userId =
+            int.Parse(User.FindFirstValue("uid")!);
+
+        try
+        {
+            await _lectureService.ExtractTextAsync(id, userId);
+
+            return Ok("Text extracted successfully.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
         }
     }
 }

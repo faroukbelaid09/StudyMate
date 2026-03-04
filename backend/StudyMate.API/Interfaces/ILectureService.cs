@@ -12,4 +12,6 @@ public interface ILectureService
     Task DeleteLectureAsync(int lectureId, int userId);
 
     Task<Lecture> GetLectureAsync(int lectureId, int userId);
+
+    Task ExtractTextAsync(int lectureId, int userId);
 }

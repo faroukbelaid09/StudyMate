@@ -11,4 +11,6 @@ public class Lecture
     public string FilePath { get; set; } = default!;
 
     public DateTime UploadedAt { get; set; }
+
+    public string? ExtractedText { get; set; }
 }
