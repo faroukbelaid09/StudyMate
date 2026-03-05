@@ -168,4 +168,26 @@ public class LecturesController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpGet("{id}/summary")]
+    public async Task<ActionResult<LectureSummaryResponse>> GetSummary(int id)
+    {
+        var userId =
+            int.Parse(User.FindFirstValue("uid")!);
+
+        try
+        {
+            var summary =
+                await _lectureService.GetSummaryAsync(id, userId);
+
+            var response =
+                new LectureSummaryResponse(id, summary);
+
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }
