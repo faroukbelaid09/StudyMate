@@ -18,4 +18,6 @@ public interface ILectureService
     Task GenerateSummaryAsync(int lectureId, int userId);
 
     Task<string> GetSummaryAsync(int lectureId, int userId);
+
+    Task GenerateFlashcardsAsync(int lectureId, int userId);
 }

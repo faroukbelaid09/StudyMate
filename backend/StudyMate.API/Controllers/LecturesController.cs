@@ -190,4 +190,22 @@ public class LecturesController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpPost("{id}/generate-flashcards")]
+    public async Task<IActionResult> GenerateFlashcards(int id)
+    {
+        var userId =
+            int.Parse(User.FindFirstValue("uid")!);
+
+        try
+        {
+            await _lectureService.GenerateFlashcardsAsync(id, userId);
+
+            return Ok("Flashcards generated.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }

@@ -238,4 +238,42 @@ public class LectureService : ILectureService
 
         return lecture.Summary;
     }
+
+    public async Task GenerateFlashcardsAsync(int lectureId, int userId)
+    {
+        var lecture = await _db.Lectures
+            .FirstOrDefaultAsync(l =>
+                l.Id == lectureId &&
+                l.UserId == userId);
+
+        if (lecture is null)
+            throw new Exception("Lecture not found.");
+
+        if (lecture.ExtractedText is null)
+            throw new Exception("Extract text first.");
+
+        //////////////////////////////////////////////////
+        // TEMPORARY FLASHCARD PLACEHOLDER
+        //////////////////////////////////////////////////
+
+        var flashcards = new List<Flashcard>
+    {
+        new Flashcard
+        {
+            LectureId = lectureId,
+            Question = "What is the main topic of this lecture?",
+            Answer = lecture.Title
+        },
+        new Flashcard
+        {
+            LectureId = lectureId,
+            Question = "How many characters were extracted?",
+            Answer = lecture.ExtractedText.Length.ToString()
+        }
+    };
+
+        _db.Flashcards.AddRange(flashcards);
+
+        await _db.SaveChangesAsync();
+    }
 }
