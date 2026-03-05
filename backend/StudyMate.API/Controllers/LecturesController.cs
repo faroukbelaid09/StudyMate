@@ -6,6 +6,7 @@ using StudyMate.API.DTOs.Lectures;
 using StudyMate.API.Models;
 using Microsoft.EntityFrameworkCore;
 using StudyMate.API.Interfaces;
+using StudyMate.API.DTOs.Flashcards;
 namespace StudyMate.API.Controllers;
 
 [ApiController]
@@ -202,6 +203,33 @@ public class LecturesController : ControllerBase
             await _lectureService.GenerateFlashcardsAsync(id, userId);
 
             return Ok("Flashcards generated.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("{id}/flashcards")]
+    public async Task<ActionResult<List<FlashcardResponse>>> GetFlashcards(int id)
+    {
+        var userId =
+            int.Parse(User.FindFirstValue("uid")!);
+
+        try
+        {
+            var flashcards =
+                await _lectureService.GetFlashcardsAsync(id, userId);
+
+            var response =
+                flashcards.Select(f =>
+                    new FlashcardResponse(
+                        f.Id,
+                        f.Question,
+                        f.Answer
+                    )).ToList();
+
+            return Ok(response);
         }
         catch (Exception ex)
         {

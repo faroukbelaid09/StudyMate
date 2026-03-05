@@ -276,4 +276,19 @@ public class LectureService : ILectureService
 
         await _db.SaveChangesAsync();
     }
+
+    public async Task<List<Flashcard>> GetFlashcardsAsync(int lectureId, int userId)
+    {
+        var lecture = await _db.Lectures
+            .FirstOrDefaultAsync(l =>
+                l.Id == lectureId &&
+                l.UserId == userId);
+
+        if (lecture is null)
+            throw new Exception("Lecture not found.");
+
+        return await _db.Flashcards
+            .Where(f => f.LectureId == lectureId)
+            .ToListAsync();
+    }
 }
