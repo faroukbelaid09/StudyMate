@@ -14,4 +14,6 @@ public interface ILectureService
     Task<Lecture> GetLectureAsync(int lectureId, int userId);
 
     Task ExtractTextAsync(int lectureId, int userId);
+
+    Task GenerateSummaryAsync(int lectureId, int userId);
 }

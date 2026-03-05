@@ -10,10 +10,14 @@ namespace StudyMate.API.Services;
 public class LectureService : ILectureService
 {
     private readonly AppDbContext _db;
+    private readonly IAiSummaryService _aiSummaryService;
 
-    public LectureService(AppDbContext db)
+    public LectureService(
+        AppDbContext db,
+        IAiSummaryService aiSummaryService)
     {
         _db = db;
+        _aiSummaryService = aiSummaryService;
     }
 
     public async Task UploadLectureAsync(int userId, string title, IFormFile file)
@@ -185,6 +189,36 @@ public class LectureService : ILectureService
         lecture.ExtractedText = extractedText;
 
         lecture.Status = LectureStatus.TextExtracted;
+
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task GenerateSummaryAsync(int lectureId, int userId)
+    {
+        var lecture = await _db.Lectures
+            .FirstOrDefaultAsync(l =>
+                l.Id == lectureId &&
+                l.UserId == userId);
+
+        if (lecture is null)
+            throw new Exception("Lecture not found.");
+
+        if (lecture.ExtractedText is null)
+            throw new Exception("Extract text first.");
+
+        //////////////////////////////////////////////////
+        // TEMPORARY AI PLACEHOLDER
+        //////////////////////////////////////////////////
+
+        var summary =
+            $"[AI Placeholder]\n\n" +
+            $"This is a temporary summary for lecture: {lecture.Title}.\n\n" +
+            $"Text length: {lecture.ExtractedText.Length} characters.\n\n" +
+            $"Later this will be generated using an AI model.";
+
+        lecture.Summary = summary;
+
+        lecture.Status = LectureStatus.SummaryGenerated;
 
         await _db.SaveChangesAsync();
     }

@@ -58,7 +58,8 @@ public class LecturesController : ControllerBase
             .Select(l => new LectureResponse(
                 l.Id,
                 l.Title,
-                l.UploadedAt
+                l.UploadedAt,
+                l.Status
             ))
             .ToListAsync();
 
@@ -118,10 +119,11 @@ public class LecturesController : ControllerBase
                 await _lectureService.GetLectureAsync(id, userId);
 
             var response = new LectureResponse(
-                lecture.Id,
-                lecture.Title,
-                lecture.UploadedAt
-            );
+    lecture.Id,
+    lecture.Title,
+    lecture.UploadedAt,
+    lecture.Status
+);
 
             return Ok(response);
         }
@@ -142,6 +144,24 @@ public class LecturesController : ControllerBase
             await _lectureService.ExtractTextAsync(id, userId);
 
             return Ok("Text extracted successfully.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost("{id}/generate-summary")]
+    public async Task<IActionResult> GenerateSummary(int id)
+    {
+        var userId =
+            int.Parse(User.FindFirstValue("uid")!);
+
+        try
+        {
+            await _lectureService.GenerateSummaryAsync(id, userId);
+
+            return Ok("Summary generated.");
         }
         catch (Exception ex)
         {

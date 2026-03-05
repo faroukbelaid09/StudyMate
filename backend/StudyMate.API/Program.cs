@@ -63,6 +63,8 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
+builder.Services.AddHttpClient<IAiSummaryService, GeminiSummaryService>();
+
 //////////////////////////////////////////////////
 // CONTROLLERS + SWAGGER
 //////////////////////////////////////////////////

@@ -15,4 +15,6 @@ public class Lecture
     public string? ExtractedText { get; set; }
 
     public LectureStatus Status { get; set; } = LectureStatus.Uploaded;
+
+    public string? Summary { get; set; }
 }
