@@ -7,6 +7,7 @@ using StudyMate.API.Models;
 using Microsoft.EntityFrameworkCore;
 using StudyMate.API.Interfaces;
 using StudyMate.API.DTOs.Flashcards;
+using StudyMate.API.DTOs.Quiz;
 namespace StudyMate.API.Controllers;
 
 [ApiController]
@@ -248,6 +249,37 @@ public class LecturesController : ControllerBase
             await _lectureService.GenerateQuizAsync(id, userId);
 
             return Ok("Quiz generated.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("{id}/quiz")]
+    public async Task<ActionResult<List<QuizQuestionResponse>>> GetQuiz(int id)
+    {
+        var userId =
+            int.Parse(User.FindFirstValue("uid")!);
+
+        try
+        {
+            var quiz =
+                await _lectureService.GetQuizAsync(id, userId);
+
+            var response =
+                quiz.Select(q =>
+                    new QuizQuestionResponse(
+                        q.Id,
+                        q.Question,
+                        q.OptionA,
+                        q.OptionB,
+                        q.OptionC,
+                        q.OptionD,
+                        q.CorrectAnswer
+                    )).ToList();
+
+            return Ok(response);
         }
         catch (Exception ex)
         {

@@ -337,4 +337,19 @@ public class LectureService : ILectureService
 
         await _db.SaveChangesAsync();
     }
+
+    public async Task<List<QuizQuestion>> GetQuizAsync(int lectureId, int userId)
+    {
+        var lecture = await _db.Lectures
+            .FirstOrDefaultAsync(l =>
+                l.Id == lectureId &&
+                l.UserId == userId);
+
+        if (lecture is null)
+            throw new Exception("Lecture not found.");
+
+        return await _db.QuizQuestions
+            .Where(q => q.LectureId == lectureId)
+            .ToListAsync();
+    }
 }
