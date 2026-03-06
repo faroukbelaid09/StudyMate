@@ -274,6 +274,8 @@ public class LectureService : ILectureService
 
         _db.Flashcards.AddRange(flashcards);
 
+        lecture.Status = LectureStatus.FlashcardsGenerated;
+
         await _db.SaveChangesAsync();
     }
 
@@ -334,6 +336,8 @@ public class LectureService : ILectureService
     };
 
         _db.QuizQuestions.AddRange(quiz);
+
+        lecture.Status = LectureStatus.QuizGenerated;
 
         await _db.SaveChangesAsync();
     }

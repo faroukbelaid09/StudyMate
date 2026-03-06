@@ -5,5 +5,7 @@ public enum LectureStatus
     Uploaded = 0,
     TextExtracted = 1,
     SummaryGenerated = 2,
-    Failed = 3
+    FlashcardsGenerated = 3,
+    QuizGenerated = 4,
+    Failed = 5
 }
