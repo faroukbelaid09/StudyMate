@@ -26,4 +26,8 @@ public interface ILectureService
     Task GenerateQuizAsync(int lectureId, int userId);
 
     Task<List<QuizQuestion>> GetQuizAsync(int lectureId, int userId);
+
+    Task<(int score, int total)> SubmitQuizAsync(int lectureId, int userId, Dictionary<int, string> answers);
+    
+
 }

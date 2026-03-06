@@ -352,4 +352,37 @@ public class LectureService : ILectureService
             .Where(q => q.LectureId == lectureId)
             .ToListAsync();
     }
+
+    public async Task<(int score, int total)> SubmitQuizAsync(
+    int lectureId,
+    int userId,
+    Dictionary<int, string> answers)
+    {
+        var lecture = await _db.Lectures
+            .FirstOrDefaultAsync(l =>
+                l.Id == lectureId &&
+                l.UserId == userId);
+
+        if (lecture is null)
+            throw new Exception("Lecture not found.");
+
+        var questions = await _db.QuizQuestions
+            .Where(q => q.LectureId == lectureId)
+            .ToListAsync();
+
+        int score = 0;
+
+        foreach (var question in questions)
+        {
+            if (answers.TryGetValue(question.Id, out var userAnswer))
+            {
+                if (userAnswer == question.CorrectAnswer)
+                {
+                    score++;
+                }
+            }
+        }
+
+        return (score, questions.Count);
+    }
 }
