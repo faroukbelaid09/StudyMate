@@ -22,4 +22,6 @@ public interface ILectureService
     Task GenerateFlashcardsAsync(int lectureId, int userId);
 
     Task<List<Flashcard>> GetFlashcardsAsync(int lectureId, int userId);
+
+    Task GenerateQuizAsync(int lectureId, int userId);
 }

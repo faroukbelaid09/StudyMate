@@ -291,4 +291,50 @@ public class LectureService : ILectureService
             .Where(f => f.LectureId == lectureId)
             .ToListAsync();
     }
+
+    public async Task GenerateQuizAsync(int lectureId, int userId)
+    {
+        var lecture = await _db.Lectures
+            .FirstOrDefaultAsync(l =>
+                l.Id == lectureId &&
+                l.UserId == userId);
+
+        if (lecture is null)
+            throw new Exception("Lecture not found.");
+
+        if (lecture.ExtractedText is null)
+            throw new Exception("Extract text first.");
+
+        //////////////////////////////////////////////////
+        // TEMPORARY QUIZ PLACEHOLDER
+        //////////////////////////////////////////////////
+
+        var quiz = new List<QuizQuestion>
+    {
+        new QuizQuestion
+        {
+            LectureId = lectureId,
+            Question = "What is the title of this lecture?",
+            OptionA = lecture.Title,
+            OptionB = "Biology",
+            OptionC = "Chemistry",
+            OptionD = "Physics",
+            CorrectAnswer = "A"
+        },
+        new QuizQuestion
+        {
+            LectureId = lectureId,
+            Question = "What was extracted from the PDF?",
+            OptionA = "Images",
+            OptionB = "Text",
+            OptionC = "Audio",
+            OptionD = "Video",
+            CorrectAnswer = "B"
+        }
+    };
+
+        _db.QuizQuestions.AddRange(quiz);
+
+        await _db.SaveChangesAsync();
+    }
 }

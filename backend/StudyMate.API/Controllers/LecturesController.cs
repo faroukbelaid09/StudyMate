@@ -236,4 +236,22 @@ public class LecturesController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
+    [HttpPost("{id}/generate-quiz")]
+    public async Task<IActionResult> GenerateQuiz(int id)
+    {
+        var userId =
+            int.Parse(User.FindFirstValue("uid")!);
+
+        try
+        {
+            await _lectureService.GenerateQuizAsync(id, userId);
+
+            return Ok("Quiz generated.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 }

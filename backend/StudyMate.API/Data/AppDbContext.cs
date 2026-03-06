@@ -10,7 +10,7 @@ public class AppDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<Lecture> Lectures => Set<Lecture>();
     public DbSet<Flashcard> Flashcards { get; set; }
-
+    public DbSet<QuizQuestion> QuizQuestions { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
