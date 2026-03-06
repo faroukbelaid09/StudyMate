@@ -25,6 +25,9 @@ public class LectureService : ILectureService
         if (file.Length == 0)
             throw new Exception("Empty file.");
 
+        if (file.Length > 10 * 1024 * 1024)
+            throw new Exception("File too large.");
+
         //////////////////////////////////////////////////
         // Save File
         //////////////////////////////////////////////////
@@ -248,6 +251,9 @@ public class LectureService : ILectureService
 
         if (lecture is null)
             throw new Exception("Lecture not found.");
+
+        if (lecture.Status >= LectureStatus.FlashcardsGenerated)
+            throw new Exception("Flashcards already generated.");
 
         if (lecture.ExtractedText is null)
             throw new Exception("Extract text first.");

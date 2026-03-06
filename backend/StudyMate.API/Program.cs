@@ -108,6 +108,17 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("frontend",
+        policy =>
+        {
+            policy.AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowAnyOrigin();
+        });
+});
+
 //////////////////////////////////////////////////
 // BUILD APP
 //////////////////////////////////////////////////
@@ -131,5 +142,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors("frontend");
 
 app.Run();
