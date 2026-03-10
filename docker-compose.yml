@@ -1,0 +1,44 @@
+services:
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: studymate-db
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+  backend:
+    build:
+      context: ./backend/StudyMate.API
+    container_name: studymate-backend
+    depends_on:
+      - db
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Server=db;Database=StudyMateDB;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;
+      Jwt__Issuer: StudyMate
+      Jwt__Audience: StudyMateUsers
+      Jwt__Key: ${JWT_KEY}
+    ports:
+      - "7204:8080"
+    volumes:
+      - ./backend/StudyMate.API/uploads:/app/uploads
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    container_name: studymate-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  sql_data:
