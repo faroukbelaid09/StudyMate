@@ -6,6 +6,7 @@ using StudyMate.API.Interfaces;
 using StudyMate.API.Services;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -69,7 +70,14 @@ builder.Services.AddHttpClient<IAiSummaryService, GeminiSummaryService>();
 // CONTROLLERS + SWAGGER
 //////////////////////////////////////////////////
 
-builder.Services.AddControllers();
+
+
+builder.Services.AddControllers()
+.AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters
+        .Add(new JsonStringEnumConverter());
+});
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -137,12 +145,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("frontend");
+
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.UseCors("frontend");
 
 app.Run();
