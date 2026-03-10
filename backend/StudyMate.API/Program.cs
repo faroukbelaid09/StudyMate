@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using StudyMate.API.Data;
 using StudyMate.API.Interfaces;
 using StudyMate.API.Services;
-using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,8 +19,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")
     ));
 
+//////////////////////////////////////////////////
+// SERVICES (Dependency Injection)
+//////////////////////////////////////////////////
 
 builder.Services.AddScoped<ILectureService, LectureService>();
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+builder.Services.AddHttpClient<IAiSummaryService, GeminiSummaryService>();
 
 //////////////////////////////////////////////////
 // JWT AUTHENTICATION
@@ -59,18 +64,8 @@ builder.Services
 builder.Services.AddAuthorization();
 
 //////////////////////////////////////////////////
-// SERVICES (Dependency Injection)
+// CONTROLLERS + JSON
 //////////////////////////////////////////////////
-
-builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-
-builder.Services.AddHttpClient<IAiSummaryService, GeminiSummaryService>();
-
-//////////////////////////////////////////////////
-// CONTROLLERS + SWAGGER
-//////////////////////////////////////////////////
-
-
 
 builder.Services.AddControllers()
 .AddJsonOptions(options =>
@@ -80,6 +75,10 @@ builder.Services.AddControllers()
 });
 
 builder.Services.AddEndpointsApiExplorer();
+
+//////////////////////////////////////////////////
+// SWAGGER
+//////////////////////////////////////////////////
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -116,6 +115,10 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+//////////////////////////////////////////////////
+// CORS (frontend access)
+//////////////////////////////////////////////////
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("frontend",
@@ -132,6 +135,31 @@ builder.Services.AddCors(options =>
 //////////////////////////////////////////////////
 
 var app = builder.Build();
+
+//////////////////////////////////////////////////
+// DATABASE MIGRATION
+//////////////////////////////////////////////////
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    var retries = 10;
+
+    while (retries > 0)
+    {
+        try
+        {
+            db.Database.Migrate();
+            break;
+        }
+        catch
+        {
+            retries--;
+            Thread.Sleep(5000);
+        }
+    }
+}
 
 //////////////////////////////////////////////////
 // MIDDLEWARE PIPELINE
